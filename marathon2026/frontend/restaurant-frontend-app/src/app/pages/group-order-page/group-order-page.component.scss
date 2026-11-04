@@ -1,0 +1,24 @@
+@use 'app/shared/styles/abstracts/colors' as color;
+:host { display: block; background: color.$neutral-100; color: color.$neutral-900; }
+.page { max-width: 860px; margin: 0 auto; padding: 40px; min-height: 70vh; }
+h1 { margin: 0; font-size: 28px; }
+.details { display: flex; flex-wrap: wrap; gap: 16px; padding: 20px 0; border-bottom: 1px solid color.$sage-100; font-size: 14px; }
+.details span { display: inline-flex; align-items: center; gap: 8px; }
+.participants { list-style: none; padding: 0; display: grid; gap: 24px; margin: 24px 0; }
+.grand { display: flex; justify-content: space-between; gap: 16px; border-top: 2px solid color.$sage-100; padding-top: 20px; font-size: 24px; font-weight: 600; }
+.grand span:last-child { color: color.$green-800; }
+.heading, .sync { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.badge { font-size: 13px; border-radius: 8px; padding: 5px 12px; background: color.$sage-100; color: color.$green-800; }
+.sync { justify-content: space-between; margin: 16px 0; font-size: 13px; color: color.$neutral-600; }
+.warning { background: color.$orange-30; color: color.$neutral-900; border: 1px solid color.$orange-100; border-radius: 8px; padding: 16px; }
+.consolidated { background: color.$neutral-0; color: color.$neutral-900; border-radius: 16px; padding: 24px; }
+.consolidated h2 { font-size: 18px; margin-top: 0; }
+.consolidated ul { list-style: none; padding: 0; margin: 0; }
+.consolidated li { display: flex; justify-content: space-between; gap: 16px; margin: 12px 0; }
+button { cursor: pointer; border: 1px solid color.$green-600; border-radius: 8px; padding: 10px 18px; background: color.$neutral-0; color: color.$green-800; font: inherit; }
+button:focus-visible { outline: 3px solid color.$green-300; outline-offset: 3px; }
+button:disabled { background: color.$neutral-200; color: color.$neutral-600; border-color: color.$neutral-200; cursor: not-allowed; }
+.primary { background: color.$green-800; color: color.$neutral-0; }
+.submit { width: 100%; min-height: 56px; font-weight: 600; }
+[modal-actions] { display: flex; flex-wrap: wrap; gap: 12px; justify-content: flex-end; }
+@media (max-width: 480px) { .page { padding: 24px 16px; } h1 { font-size: 24px; } .details { gap: 12px; } }

@@ -1,0 +1,26 @@
+[
+  {
+    "restApiId": "2v8o0dlq2g",
+    "responseType": "UNAUTHORIZED",
+    "patchOperations": [
+      { "op": "replace", "path": "/statusCode", "value": "401" },
+      {
+        "op": "add",
+        "path": "/responseParameters/gatewayresponse.header.Access-Control-Allow-Origin",
+        "value": "'https://d14f8spjgetu2u.cloudfront.net'"
+      }
+    ]
+  },
+  {
+    "restApiId": "2v8o0dlq2g",
+    "responseType": "ACCESS_DENIED",
+    "patchOperations": [
+      { "op": "replace", "path": "/statusCode", "value": "403" },
+      {
+        "op": "add",
+        "path": "/responseParameters/gatewayresponse.header.Access-Control-Allow-Origin",
+        "value": "'https://d14f8spjgetu2u.cloudfront.net'"
+      }
+    ]
+  }
+]

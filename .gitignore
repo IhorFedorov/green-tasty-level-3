@@ -1,0 +1,113 @@
+# Local course materials and project-only tools
+/EPAM-Materials/
+/.tools/
+
+# Python environments and caches
+.venv/
+venv/
+env/
+syndicate_venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets and personal environment files
+.env*
+!.env.example
+!.env.sample
+!.env.template
+!.env.*.example
+.aws/
+.ssh/
+.netrc
+.npmrc
+.pypirc
+!.npmrc.example
+credentials
+credentials.*
+!credentials.example
+!credentials.*.example
+aws-credentials*
+*.pem
+*.key
+*.p12
+*.pfx
+*.p8
+*.jks
+*.keystore
+id_rsa
+id_ed25519
+*.local.yml
+*.local.yaml
+*.local.json
+
+# Terraform: keep source .tf files and .terraform.lock.hcl
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+*.tfplan
+*.tfplan.*
+tfplan
+tfplan.*
+.terraformrc
+terraform.rc
+crash.log
+crash.*.log
+!*.tfvars.example
+!*.tfvars.json.example
+
+# Syndicate: keep shared syndicate.yml and syndicate_aliases.yml
+.syndicate
+.syndicate.lock
+.syndicate-config-local*/
+bundles/
+logs/
+**/.syndicate-config-*/outputs/
+
+# Node.js / Angular: keep package.json and package-lock.json
+node_modules/
+.angular/
+.npm/
+dist/
+out-tsc/
+coverage/
+
+# .NET: keep project files and NuGet lock files
+[Bb]in/
+[Oo]bj/
+TestResults/
+.vs/
+*.user
+*.suo
+
+# macOS, editors, temporary files
+.DS_Store
+._*
+.idea/
+.vscode/
+tmp/
+temp/
+*.log
+*.tmp
+*.swp
+*.bak
+*.orig
+*~
+
+# Archives and deployment bundles
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+
+# Local private project context and agent configuration
+/project-knowledge/
+/AGENTS.md
+/.kiro/
+/.codex/

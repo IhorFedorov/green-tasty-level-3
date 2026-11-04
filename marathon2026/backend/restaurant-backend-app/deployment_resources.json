@@ -1,0 +1,1308 @@
+{
+  "lambda-basic-execution": {"policy_content": {"Version": "2012-10-17", "Statement": [{"Sid": "OwnLogGroup", "Effect": "Allow", "Action": ["logs:CreateLogGroup"], "Resource": ["arn:aws:logs:${region}:${account_id}:log-group:/aws/lambda/api-handler"]}, {"Sid": "OwnLogStreams", "Effect": "Allow", "Action": ["logs:CreateLogStream", "logs:PutLogEvents"], "Resource": ["arn:aws:logs:${region}:${account_id}:log-group:/aws/lambda/api-handler:log-stream:*"]}, {"Sid": "DenyDeploymentStorage", "Effect": "Deny", "Action": ["s3:*"], "Resource": ["arn:aws:s3:::restaurant-terraform-state-${account_id}", "arn:aws:s3:::restaurant-terraform-state-${account_id}/*", "arn:aws:s3:::marathon2026-restaurant-artifacts-${account_id}", "arn:aws:s3:::marathon2026-restaurant-artifacts-${account_id}/*"]}, {"Sid": "TableWaiters", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Scan", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Waiters"]}, {"Sid": "TableFeedback", "Effect": "Allow", "Action": ["dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Feedback"]}, {"Sid": "TableTables", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Scan", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Tables"]}, {"Sid": "TableDishes", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Dishes"]}, {"Sid": "TableReservations", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Reservations"]}, {"Sid": "TableLocations", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Scan", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Locations"]}, {"Sid": "TableProfileImages", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/ProfileImages"]}, {"Sid": "TableOrders", "Effect": "Allow", "Action": ["dynamodb:Scan", "dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Orders"]}, {"Sid": "TableReports", "Effect": "Allow", "Action": ["dynamodb:Scan", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Reports"]}, {"Sid": "TableReportsHistory", "Effect": "Allow", "Action": ["dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/ReportsHistory"]}, {"Sid": "TableNotifications", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Notifications"]}, {"Sid": "TableGroupReservations", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/GroupReservations"]}, {"Sid": "TableGuestSessions", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/GuestSessions"]}, {"Sid": "ExactIndexes", "Effect": "Allow", "Action": ["dynamodb:Query"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Waiters/index/locationId-index", "arn:aws:dynamodb:${region}:${account_id}:table/Feedback/index/locationId-createdAt-index", "arn:aws:dynamodb:${region}:${account_id}:table/Tables/index/locationId-tableNumber-index", "arn:aws:dynamodb:${region}:${account_id}:table/Reservations/index/GSI_ByTableId", "arn:aws:dynamodb:${region}:${account_id}:table/Reservations/index/GSI_WaiterId", "arn:aws:dynamodb:${region}:${account_id}:table/Reservations/index/GSI_UserId", "arn:aws:dynamodb:${region}:${account_id}:table/Orders/index/GSI_CustomerId", "arn:aws:dynamodb:${region}:${account_id}:table/Orders/index/GSI_ReservationId", "arn:aws:dynamodb:${region}:${account_id}:table/ReportsHistory/index/UserIdIndex", "arn:aws:dynamodb:${region}:${account_id}:table/Notifications/index/UserIdIndex", "arn:aws:dynamodb:${region}:${account_id}:table/GroupReservations/index/reservationToken", "arn:aws:dynamodb:${region}:${account_id}:table/GroupReservations/index/reservationId", "arn:aws:dynamodb:${region}:${account_id}:table/GuestSessions/index/groupReservationId", "arn:aws:dynamodb:${region}:${account_id}:table/GuestSessions/index/guestSessionTokenHash"]}, {"Sid": "CatalogUploads", "Effect": "Allow", "Action": ["s3:PutObject"], "Resource": ["arn:aws:s3:::restaurant-backend-dev-images-${account_id}/assets/img/dishes/*", "arn:aws:s3:::restaurant-backend-dev-images-${account_id}/assets/img/locations/*"]}, {"Sid": "ProfileImages", "Effect": "Allow", "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"], "Resource": ["arn:aws:s3:::restaurant-backend-dev-profile-images-${account_id}/profile-img/*"]}, {"Sid": "UserPoolOperations", "Effect": "Allow", "Action": ["cognito-idp:AdminGetUser", "cognito-idp:ListUsers", "cognito-idp:ListGroups", "cognito-idp:CreateGroup", "cognito-idp:AdminAddUserToGroup", "cognito-idp:AdminRemoveUserFromGroup", "cognito-idp:AdminConfirmSignUp", "cognito-idp:AdminUpdateUserAttributes", "cognito-idp:AdminListGroupsForUser"], "Resource": ["arn:aws:cognito-idp:${region}:${account_id}:userpool/${cognitoUserPoolId}"]}, {"Sid": "ReportsEnqueue", "Effect": "Allow", "Action": ["sqs:GetQueueUrl", "sqs:SendMessage"], "Resource": ["arn:aws:sqs:${region}:${account_id}:restaurant-reports-queue"]}]}, "resource_type": "iam_policy", "tags": {}},
+  "reports-handler-runtime": {"policy_content": {"Version": "2012-10-17", "Statement": [{"Sid": "OwnLogGroup", "Effect": "Allow", "Action": ["logs:CreateLogGroup"], "Resource": ["arn:aws:logs:${region}:${account_id}:log-group:/aws/lambda/reports-handler"]}, {"Sid": "OwnLogStreams", "Effect": "Allow", "Action": ["logs:CreateLogStream", "logs:PutLogEvents"], "Resource": ["arn:aws:logs:${region}:${account_id}:log-group:/aws/lambda/reports-handler:log-stream:*"]}, {"Sid": "DenyDeploymentStorage", "Effect": "Deny", "Action": ["s3:*"], "Resource": ["arn:aws:s3:::restaurant-terraform-state-${account_id}", "arn:aws:s3:::restaurant-terraform-state-${account_id}/*", "arn:aws:s3:::marathon2026-restaurant-artifacts-${account_id}", "arn:aws:s3:::marathon2026-restaurant-artifacts-${account_id}/*"]}, {"Sid": "DailyAggregates", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Reports"]}, {"Sid": "ReportsQueueConsumer", "Effect": "Allow", "Action": ["sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], "Resource": ["arn:aws:sqs:${region}:${account_id}:restaurant-reports-queue"]}]}, "resource_type": "iam_policy", "tags": {}},
+  "report-sender-runtime": {"policy_content": {"Version": "2012-10-17", "Statement": [{"Sid": "OwnLogGroup", "Effect": "Allow", "Action": ["logs:CreateLogGroup"], "Resource": ["arn:aws:logs:${region}:${account_id}:log-group:/aws/lambda/report-sender"]}, {"Sid": "OwnLogStreams", "Effect": "Allow", "Action": ["logs:CreateLogStream", "logs:PutLogEvents"], "Resource": ["arn:aws:logs:${region}:${account_id}:log-group:/aws/lambda/report-sender:log-stream:*"]}, {"Sid": "DenyDeploymentStorage", "Effect": "Deny", "Action": ["s3:*"], "Resource": ["arn:aws:s3:::restaurant-terraform-state-${account_id}", "arn:aws:s3:::restaurant-terraform-state-${account_id}/*", "arn:aws:s3:::marathon2026-restaurant-artifacts-${account_id}", "arn:aws:s3:::marathon2026-restaurant-artifacts-${account_id}/*"]}, {"Sid": "ReadAggregates", "Effect": "Allow", "Action": ["dynamodb:Scan", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Reports"]}, {"Sid": "ReadLocations", "Effect": "Allow", "Action": ["dynamodb:GetItem", "dynamodb:DescribeTable"], "Resource": ["arn:aws:dynamodb:${region}:${account_id}:table/Locations"]}, {"Sid": "Recipients", "Effect": "Allow", "Action": ["cognito-idp:ListUsersInGroup"], "Resource": ["arn:aws:cognito-idp:${region}:${account_id}:userpool/${cognitoUserPoolId}"]}]}, "resource_type": "iam_policy", "tags": {}},
+  "${api_gateway_name}": {
+    "resource_type": "api_gateway",
+    "deploy_stage": "develop",
+    "policy_statement_singleton": true,
+    "dependencies": [],
+    "resources": {
+      "/waiters": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/waiters/{userId}/location": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/register": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true
+        }
+      },
+      "/signin": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/feedback": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "enable_proxy": true,
+          "default_error_pattern": true
+        },
+        "POST": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "enable_proxy": true,
+          "default_error_pattern": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "enable_proxy": true,
+          "default_error_pattern": true
+        }
+      },
+      "/locations": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/locations/{id}": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/locations/{locationId}/dishes/{dishId}": {
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "default_error_pattern": true
+        }
+      },
+      "/locations/{locationId}/tables/all": {
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "default_error_pattern": true
+        }
+      },
+      "/tables/{id}": {
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "default_error_pattern": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "default_error_pattern": true
+        }
+      },
+      "/available-tables": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/tables": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/dishes": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/dishes/{id}": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "default_error_pattern": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "enable_proxy": true,
+          "default_error_pattern": true
+        }
+      },
+      "/dishes/popular": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/locations/{id}/dishes": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/users/{id}/name": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/me": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/me/change-password": {
+        "enable_cors": {
+          "state": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/feedback": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/tables/{id}/available-time-slots": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/users": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/users/{id}/profile-image": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/me/profile-image": {
+        "enable_cors": {
+          "state": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/orders": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/orders/{reservationId}": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "PUT": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/orders/{reservationId}/submit": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/orders/{reservationId}/unsubmit": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/status": {
+        "enable_cors": {
+          "state": true
+        },
+        "PATCH": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/table": {
+        "enable_cors": {
+          "state": true
+        },
+        "PATCH": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/order/confirmations/{dishId}": {
+        "enable_cors": {
+          "state": true
+        },
+        "PATCH": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/order/cancellations/{dishId}": {
+        "enable_cors": {
+          "state": true
+        },
+        "PATCH": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reports/download": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reports/generate": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reports": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/notifications": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/notifications/{id}/read": {
+        "enable_cors": {
+          "state": true
+        },
+        "PATCH": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/invites/{token}": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/sessions": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/group/{groupReservationId}/sessions": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/groups/{groupReservationId}/sessions": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/guest-session-id": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/group-reservations/{groupReservationId}/submit": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/sessions/{guestSessionId}/dishes": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        },
+        "DELETE": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/groups/{groupReservationId}/sessions/{guestSessionId}": {
+        "enable_cors": {
+          "state": true
+        },
+        "DELETE": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/groups/{groupReservationId}/status": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/sessions/{guestSessionId}/menu": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/sessions/{guestSessionId}/submit": {
+        "enable_cors": {
+          "state": true
+        },
+        "POST": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/reservations/{reservationId}/invite-token": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "cognito_authorizer",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      },
+      "/guest/sessions/{guestSessionId}": {
+        "enable_cors": {
+          "state": true
+        },
+        "GET": {
+          "authorization_type": "NONE",
+          "integration_type": "lambda",
+          "lambda_name": "api-handler",
+          "api_key_required": false,
+          "method_request_parameters": {},
+          "integration_request_body_template": {},
+          "responses": [],
+          "integration_responses": [],
+          "default_error_pattern": true,
+          "enable_proxy": true
+        }
+      }
+    },
+    "tags": {},
+    "authorizers": {
+      "cognito_authorizer": {
+        "type": "COGNITO_USER_POOLS",
+        "identity_source": "method.request.header.Authorization",
+        "user_pools": [
+          "${user_pool_name}"
+        ]
+      }
+    }
+  },
+  "Waiters": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "userId",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "${waiters_global_index}",
+        "index_key_name": "locationId",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "${feedback_table_name}": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "reservationId",
+    "hash_key_type": "S",
+    "sort_key_name": "createdAt",
+    "sort_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "${feedback_global_index}",
+        "index_key_name": "locationId",
+        "index_key_type": "S",
+        "index_sort_key_name": "createdAt",
+        "index_sort_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Tables": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "${tables-locationId-global-index}",
+        "index_key_name": "locationId",
+        "index_key_type": "S",
+        "index_sort_key_name": "tableNumber",
+        "index_sort_key_type": "N"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Dishes": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Reservations": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "GSI_ByTableId",
+        "index_key_name": "tableId",
+        "index_key_type": "S"
+      },
+      {
+        "name": "GSI_WaiterId",
+        "index_key_name": "waiterId",
+        "index_key_type": "S"
+      },
+      {
+        "name": "GSI_UserId",
+        "index_key_name": "customerId",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Locations": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "ProfileImages": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "userId",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Orders": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "orderId",
+    "hash_key_type": "S",
+    "sort_key_name": "customerId",
+    "sort_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "GSI_CustomerId",
+        "index_key_name": "customerId",
+        "index_key_type": "S"
+      },
+      {
+        "name": "GSI_ReservationId",
+        "index_key_name": "reservationId",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Reports": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "waiterId",
+    "hash_key_type": "S",
+    "sort_key_name": "date",
+    "sort_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "ReportsHistory": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "UserIdIndex",
+        "index_key_name": "userId",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "Notifications": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "id",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "UserIdIndex",
+        "index_key_name": "userId",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "GroupReservations": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "groupReservationId",
+    "hash_key_type": "S",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "reservationToken",
+        "index_key_name": "reservationToken",
+        "index_key_type": "S"
+      },
+      {
+        "name": "reservationId",
+        "index_key_name": "reservationId",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  },
+  "GuestSessions": {
+    "resource_type": "dynamodb_table",
+    "hash_key_name": "guestSessionId",
+    "hash_key_type": "S",
+    "billing_mode": "PAY_PER_REQUEST",
+    "read_capacity": 1,
+    "write_capacity": 1,
+    "global_indexes": [
+      {
+        "name": "groupReservationId",
+        "index_key_name": "groupReservationId",
+        "index_key_type": "S"
+      },
+      {
+        "name": "guestSessionTokenHash",
+        "index_key_name": "guestSessionTokenHash",
+        "index_key_type": "S"
+      }
+    ],
+    "autoscaling": [],
+    "tags": {}
+  }
+}
+
+
+
+

@@ -1,0 +1,34 @@
+<main class="page" [attr.aria-busy]="loading()">
+  <header class="heading"><h1>Group Pre-Order</h1>
+    @if (groupStatus(); as status) { <span class="badge">{{ status.status === 'Open' ? 'Collecting pre-orders' : status.status === 'Submitted' ? 'Sent to Restaurant' : 'Closed' }}</span> }
+  </header>
+  @if (loading()) { <p role="status">Loading group pre-order…</p> }
+  @else if (error()) { <p role="alert">{{ error() }}</p><button type="button" (click)="load()">Try again</button> }
+  @else {
+    @if (invite(); as details) {
+      <div class="details"><span><img src="assets/svg/location-green.svg" alt="" width="16" height="16" />{{ details.LocationAddress }}</span><span><img src="assets/svg/calendar-green.svg" alt="" width="16" height="16" />{{ details.StartTime | date:'MMM d, y' }}</span><span><img src="assets/svg/clock-green.svg" alt="" width="16" height="16" />{{ details.StartTime | date:'HH:mm' }} – {{ details.EndTime | date:'HH:mm' }}</span><span><img src="assets/svg/people-green.svg" alt="" width="16" height="16" />{{ groupStatus()?.currentParticipants }} of {{ details.MaxGuestCount }} guests</span></div>
+    }
+    <div class="sync"><span>Updated at {{ updatedAt() | date:'HH:mm:ss' }}</span>
+      @if (open()) { <button type="button" [disabled]="refreshing() || submitting()" (click)="refresh()">Refresh</button> }
+    </div>
+    @if (refreshFailed()) { <p role="status">Couldn't refresh. Showing data from {{ updatedAt() | date:'HH:mm:ss' }}</p> }
+    @if (pendingCount() && open()) {
+      <p class="warning">{{ pendingCount() }} {{ pendingCount() === 1 ? "participant hasn't" : "participants haven't" }} submitted their cart yet — their dishes won't be included in the order</p>
+    }
+    @if (empty()) { <p class="empty">Participants haven't added any dishes yet</p> }
+    <ul class="participants">@for (person of participants(); track person.id) { <li><app-participant-card [participant]="person" [isMe]="person.id === ownerSessionId()" /></li> }</ul>
+    <section class="consolidated" aria-label="Consolidated pre-order">
+      <h2>Consolidated pre-order</h2>
+      <ul>@for (item of consolidated().items; track item.dish.id) { <li><span>{{ item.dish.name }} × {{ item.quantity }}</span><span>{{ item.dish.price * item.quantity | currency }}</span></li> }</ul>
+    </section>
+    <p class="grand"><span>Grand Total</span><span>{{ consolidated().total | currency }}</span></p>
+    @if (open()) { <button class="primary submit" type="button" [disabled]="!canSubmit()" (click)="confirmSubmit.set(true)">Submit Pre-Order</button> }
+  }
+  @if (confirmSubmit()) {
+    <app-modal title="Submit Pre-Order" [closeOnBackdrop]="!submitting()" (closed)="!submitting() && confirmSubmit.set(false)">
+      <p>Send the submitted carts to the restaurant? Unsubmitted carts will not be included.</p>
+      <p role="note">This replaces the reservation's existing pre-order. Dishes in your regular cart are not added automatically; only submitted participant carts are sent.</p>
+      <div modal-actions><button type="button" [disabled]="submitting()" (click)="confirmSubmit.set(false)">Cancel</button><button class="primary" type="button" [disabled]="submitting() || !canSubmit()" (click)="submit()">{{ submitting() ? 'Submitting…' : 'Submit' }}</button></div>
+    </app-modal>
+  }
+</main>
