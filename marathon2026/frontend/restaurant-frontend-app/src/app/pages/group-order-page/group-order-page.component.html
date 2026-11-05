@@ -1,6 +1,9 @@
 <main class="page" [attr.aria-busy]="loading()">
   <header class="heading"><h1>Group Pre-Order</h1>
     @if (groupStatus(); as status) { <span class="badge">{{ status.status === 'Open' ? 'Collecting pre-orders' : status.status === 'Submitted' ? 'Sent to Restaurant' : 'Closed' }}</span> }
+    @if (!loading() && !error() && inviteLink()) {
+      <button type="button" [disabled]="submitting()" (click)="showInvite()">Invite guests</button>
+    }
   </header>
   @if (loading()) { <p role="status">Loading group pre-order…</p> }
   @else if (error()) { <p role="alert">{{ error() }}</p><button type="button" (click)="load()">Try again</button> }
@@ -23,6 +26,16 @@
     </section>
     <p class="grand"><span>Grand Total</span><span>{{ consolidated().total | currency }}</span></p>
     @if (open()) { <button class="primary submit" type="button" [disabled]="!canSubmit()" (click)="confirmSubmit.set(true)">Submit Pre-Order</button> }
+  }
+  @if (inviteDialog() && inviteLink()) {
+    <app-modal title="Invite guests" (closed)="inviteDialog.set(false)">
+      <label for="group-invite-link">Invite Link</label>
+      <input id="group-invite-link" type="text" readonly [value]="inviteLink()" />
+      <p>Share this link with your guests to join the pre-order.</p>
+      <div modal-actions>
+        <button type="button" [disabled]="copyingInvite()" (click)="copyInviteLink()">Copy Invite Link</button>
+      </div>
+    </app-modal>
   }
   @if (confirmSubmit()) {
     <app-modal title="Submit Pre-Order" [closeOnBackdrop]="!submitting()" (closed)="!submitting() && confirmSubmit.set(false)">

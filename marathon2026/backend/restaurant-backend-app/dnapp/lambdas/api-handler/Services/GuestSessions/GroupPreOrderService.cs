@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 namespace APIHandler.Services.GuestSessions;
 
 public record ConsolidatedDish(string DishId, int Quantity);
+public record OwnerGroupState(string GroupReservationId, string Status, string? GuestSessionId,
+    DateTime StartTime, DateTime EndTime, int MaxGuestCount, string LocationAddress,
+    IReadOnlyList<ConsolidatedDish>? SubmittedItems);
 
 public class GroupPreOrderService(IReservationRepository reservations, IGroupReservationRepository groups,
     IGuestSessionRepository sessions, IOrderRepository orders, IGroupPreOrderWriter writer)
@@ -26,6 +29,36 @@ public class GroupPreOrderService(IReservationRepository reservations, IGroupRes
         if (string.IsNullOrWhiteSpace(userId) || reservation.CustomerId != userId)
             throw new ActionForbiddenException("Only the reservation owner can perform this action.");
         return reservation;
+    }
+
+    // Read-only mode of the existing Cognito-protected Owner endpoint. Never ensures a session.
+    public async Task<OwnerGroupState> GetOwnerGroupStateAsync(string userId, string reservationId)
+    {
+        var reservation = await OwnerAsync(userId, reservationId);
+        var group = await groups.GetByReservationIdAsync(reservationId)
+            ?? throw new GroupReservationNotFoundException();
+        if (group.ReservationId != reservationId)
+            throw new ValidationException("Reservation does not belong to this group.");
+        if (group.Status == GroupReservationStatus.Closed)
+            throw new ValidationException("Group is closed.");
+        if (group.Status == GroupReservationStatus.Open)
+            return new(group.GroupReservationId, "Open", null, reservation.StartTime,
+                reservation.EndTime, reservation.GuestCount, "", null);
+        if (group.Status != GroupReservationStatus.Submitted)
+            throw new ValidationException("Unsupported group status.");
+
+        var order = await orders.GetOrderByReservationIdAsync(reservationId)
+            ?? throw new ValidationException("Order not found.");
+        if (order.CustomerId != userId || order.ReservationId != reservationId ||
+            order.Status != OrderStatus.SubmittedByCustomer)
+            throw new ValidationException("Submitted order does not match this reservation owner.");
+        var owners = (await sessions.GetAllByGroupReservationIdAsync(group.GroupReservationId))
+            .Where(s => s.IsOwnerSession).ToArray();
+        if (owners.Length > 1 || owners.Any(s => s.OwnerUserId != userId))
+            throw new ValidationException("Conflicting owner sessions; manual review required.");
+        return new(group.GroupReservationId, "Submitted", owners.SingleOrDefault()?.Id,
+            reservation.StartTime, reservation.EndTime, reservation.GuestCount, order.ReservationAddress,
+            order.Dishes.Select(i => new ConsolidatedDish(i.DishId, i.Quantity)).ToArray());
     }
 
     public async Task<string> GetOwnerSessionIdAsync(string userId, string reservationId)

@@ -1,8 +1,27 @@
 # EPAM Backend Homework #5 — Owner Group Pre-order
 
+## Local P1 invitation ownership — 2026-11-05
+
+Existing invitation-token endpoint now requires trusted Cognito `sub` and matches
+Reservation.CustomerId before eligibility/group/token lookup. Missing identity
+returns401; another owner returns403. Missing group returns404 without creation;
+inconsistent parent fails closed. Retrieval reuses the stored token and performs
+only reads. Service contract requires the authenticated user ID. All P0/Open/
+guest/invitation focused regressions pass:153tests. No API route/IAM/schema or
+production changes; not deployed. Public invitation-based guest access unchanged.
+
+## Local P0 Submitted Owner read — 2026-11-05
+
+Existing authenticated `GET /reservations/{reservationId}/guest-session-id` adds
+explicit `?view=state`: Owner-only read metadata/status/persisted Order quantities,
+without ensuring/creating a session. Original no-query behavior is unchanged.
+Submitted reads verify parent Owner and SubmittedByCustomer Order; no invitation
+token is returned. Unknown views fail closed. Focused group regression91 passed;
+no AWS writes/deployment. Backend code must be released before the matching
+frontend; no API route/IAM/schema change is introduced. Preserve CORS overlays.
+
 Local implementation of Levels 1–3 in the existing .NET 10 backend.
-Requirements are based on the EPAM backend homework; original course instructions
-are not redistributed in this public snapshot.
+Requirements: [original homework](../../homework-backend.md).
 API reference: [ApiRoutes](docs/ApiRoutes.md). The backend is deployed; authenticated
 Owner/Guest group E2E is still pending. See [current submission evidence](../../LEVEL_3_SUBMISSION.md).
 

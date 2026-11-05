@@ -23,14 +23,34 @@ describe('Рівень 2 · GroupOrdersService', () => {
 
   afterEach(() => http.verify());
 
+  it('Owner state uses only the existing protected route with read-only query mode', () => {
+    service.getOwnerState$('a/b').subscribe();
+    const req = http.expectOne(`${BASE_URL}/reservations/a%2Fb/guest-session-id?view=state`);
+    expect(req.request.method).toBe('GET');
+    req.flush({ status: 'Submitted' });
+  });
+
   it('getGroupInvite$: reservationId → invite-token → invite', () => {
     let groupId = '';
-    service.getGroupInvite$('res-1').subscribe((invite) => (groupId = invite.GroupReservationId));
+    let invitationPath = '';
+    service.getGroupInvite$('res-1').subscribe(invite => {
+      groupId = invite.GroupReservationId;
+      invitationPath = invite.invitationPath ?? '';
+    });
 
     http.expectOne(`${BASE_URL}/reservations/res-1/invite-token`).flush({ token: 'tok' });
     http.expectOne(`${BASE_URL}/guest/invites/tok`).flush({ GroupReservationId: 'grp-1' });
 
     expect(groupId).toBe('grp-1');
+    expect(invitationPath).toBe('/join/tok');
+  });
+
+  it('invitation path encodes the issued token and adds no extra request', () => {
+    let path = '';
+    service.getGroupInvite$('res-1').subscribe(invite => path = invite.invitationPath ?? '');
+    http.expectOne(`${BASE_URL}/reservations/res-1/invite-token`).flush({ token: 'a/b?c' });
+    http.expectOne(`${BASE_URL}/guest/invites/a%2Fb%3Fc`).flush({ GroupReservationId: 'grp-1' });
+    expect(path).toBe('/join/a%2Fb%3Fc');
   });
 
   it('getSessions$: GET /guest/groups/{id}/sessions', () => {

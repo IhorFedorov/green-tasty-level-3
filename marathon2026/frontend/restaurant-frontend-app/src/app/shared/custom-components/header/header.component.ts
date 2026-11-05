@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ChangeDetectionStrategy, signal, computed, effect, inject } from '@angular/core';
 import { Roles } from '@app/shared/constants/roles';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { UserModel } from '@app/auth/models/user.model';
 import { AuthenticationService } from '@app/auth/services/authentication.service';
 import { AsyncPipe, CommonModule } from '@angular/common';
@@ -9,6 +9,8 @@ import { NotificationsService } from '@app/services/notifications/notifications.
 import { Notification } from '@app/models/notifications/notification.model';
 import { CartComponent } from '@app/components/cart/cart.component';
 import { GuestPreorderStore } from '@app/pages/guest-pre-order-page/state/guest-preorder.store';
+import { CartQuantityService } from '@app/services/pre-orders/cart-quantity.service';
+import { PreOrdersService } from '@app/services/pre-orders/pre-orders.service';
 
 @Component({
   selector: 'app-header',
@@ -44,6 +46,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   private pollingSubscription?: Subscription;
   private userSubscription?: Subscription;
+  private cartLoad?: Subscription;
+  private navigation?: Subscription;
+  readonly cartQuantities = inject(CartQuantityService);
+  private readonly preOrders = inject(PreOrdersService);
 
   protected readonly authService = inject(AuthenticationService);
   private readonly notificationsService = inject(NotificationsService);
@@ -73,13 +79,29 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.userSubscription = this.authService.user$.subscribe((u) => this.user.set(u));
+    this.userSubscription = this.authService.user$.subscribe(u => {
+      this.user.set(u);
+      const changed = this.cartQuantities.setOwner(u?.role === Roles.CUSTOMER ? u.id : null);
+      this.syncCartContext();
+      if (changed || !this.cartQuantities.hasSnapshot()) {
+        this.cartLoad?.unsubscribe();
+        if (u?.role === Roles.CUSTOMER) this.cartLoad = this.preOrders.getPreOrders().subscribe({ error: () => {} });
+      }
+    });
+    this.navigation = this.router.events.subscribe(event => { if (event instanceof NavigationEnd) this.syncCartContext(); });
+  }
+
+  private syncCartContext(): void {
+    const url = this.router.parseUrl(this.router.url);
+    const group = /^\/reservations\/([^/]+)\/group-order(?:[?#]|$)/.exec(this.router.url);
+    this.cartQuantities.selectReservation(url.queryParams['reservationId'] || (group ? decodeURIComponent(group[1]) : ''));
   }
 
   ngOnDestroy() {
     this.isDestroyed = true;
     this.stopNotificationsPolling();
     this.userSubscription?.unsubscribe();
+    this.cartLoad?.unsubscribe(); this.navigation?.unsubscribe();
   }
 
   startNotificationsPolling() {

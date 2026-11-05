@@ -26,6 +26,13 @@ describe('Owner group auth versus guest auth', () => {
       expect(request.request.headers.get('Authorization')).toBe('Bearer owner-test-token'); request.flush({});
     }
   });
+  it('attaches Cognito auth to read-only Owner state query', () => {
+    const url = 'https://api.test/reservations/r/guest-session-id?view=state';
+    http.get(url).subscribe();
+    const request = controller.expectOne(url);
+    expect(request.request.headers.get('Authorization')).toBe('Bearer owner-test-token');
+    request.flush({ status: 'Submitted' });
+  });
   it('does not replace the guest token on existing guest cart requests', () => {
     const url = 'https://api.test/guest/sessions/guest';
     http.get(url, { headers: { Authorization: 'Bearer guest-test-token' } }).subscribe();

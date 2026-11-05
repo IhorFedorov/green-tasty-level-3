@@ -183,7 +183,7 @@ public class GroupReservationServiceTests
             .Setup(r => r.GetByReservationIdAsync(reservation.Id))
             .ReturnsAsync(groupReservation);
 
-        GetGroupInviteTokenResponse result = await _service.GetGroupReservationInviteTokenAsync(reservation.Id);
+        GetGroupInviteTokenResponse result = await _service.GetGroupReservationInviteTokenAsync(reservation.Id, reservation.CustomerId!);
 
         Assert.Equal(groupReservation.ReservationToken, result.Token);
     }
@@ -196,7 +196,7 @@ public class GroupReservationServiceTests
             .Setup(r => r.GetReservationByIdAsync(reservationId))
             .ReturnsAsync((Reservation?)null);
 
-        await Assert.ThrowsAsync<ReservationNotFoundException>(() => _service.GetGroupReservationInviteTokenAsync(reservationId));
+        await Assert.ThrowsAsync<ReservationNotFoundException>(() => _service.GetGroupReservationInviteTokenAsync(reservationId, "owner"));
     }
 
     [Theory]
@@ -210,7 +210,7 @@ public class GroupReservationServiceTests
             .Setup(r => r.GetReservationByIdAsync(reservation.Id))
             .ReturnsAsync(reservation);
 
-        await Assert.ThrowsAsync<ValidationException>(() => _service.GetGroupReservationInviteTokenAsync(reservation.Id));
+        await Assert.ThrowsAsync<ValidationException>(() => _service.GetGroupReservationInviteTokenAsync(reservation.Id, reservation.CustomerId!));
     }
 
     [Theory]
@@ -226,7 +226,7 @@ public class GroupReservationServiceTests
             .Setup(r => r.GetReservationByIdAsync(reservation.Id))
             .ReturnsAsync(reservation);
 
-        await Assert.ThrowsAsync<ValidationException>(() => _service.GetGroupReservationInviteTokenAsync(reservation.Id));
+        await Assert.ThrowsAsync<ValidationException>(() => _service.GetGroupReservationInviteTokenAsync(reservation.Id, reservation.CustomerId!));
     }
 
     [Theory]
@@ -247,6 +247,6 @@ public class GroupReservationServiceTests
             .Setup(r => r.GetByReservationIdAsync(reservation.Id))
             .ReturnsAsync(groupReservation);
 
-        await Assert.ThrowsAsync(type, () => _service.GetGroupReservationInviteTokenAsync(reservation.Id));
+        await Assert.ThrowsAsync(type, () => _service.GetGroupReservationInviteTokenAsync(reservation.Id, reservation.CustomerId!));
     }
 }

@@ -3,6 +3,12 @@
     <img src="assets/svg/logo_vegeterian.svg" alt="vegetarian image" class="logo-image" />
   </a>
   @if (!isSubmittedGuestPreorder) {
+  @if (user()?.role === Roles.CUSTOMER && !isGuestPreorderRoute) {
+    <button type="button" class="icon-button icon-button--small cart-counter-button mobile-cart-shortcut" (click)="toggleCart()" [attr.aria-label]="'Open cart, ' + cartQuantities.quantity() + ' items in the selected reservation draft'">
+      <img src="assets/svg/cart-empty.svg" alt="" width="24" height="24" />
+      <span class="cart-quantity" aria-hidden="true">{{ cartQuantities.quantity() }}</span>
+    </button>
+  }
   <button class="mobile-menu-icon" (click)="toggleMobileMenu()">
     <img src="../../../../assets/svg/menu.svg" alt="menu icon" />
   </button>
@@ -51,9 +57,10 @@
       @if (user()?.role === Roles.CUSTOMER && !isGuestPreorderRoute) {
         @if (!showCart()) {
           <div>
-            <button type="button" class="icon-button icon-button--large" (click)="toggleCart()">
+            <button type="button" class="icon-button icon-button--large cart-counter-button" (click)="toggleCart()" [attr.aria-label]="'Open cart, ' + cartQuantities.quantity() + ' items in the selected reservation draft'">
               <img src="assets/svg/cart-empty.svg" alt="cart icon" class="action-icon" />
               <h5> Cart</h5>
+              <span class="cart-quantity" aria-hidden="true">{{ cartQuantities.quantity() }}</span>
             </button>
           </div>
         }
@@ -144,12 +151,13 @@
     }
 
     @if (user()?.role === Roles.CUSTOMER && !isGuestPreorderRoute) {
-      <button class="icon-button icon-button--small" type="button"  (click)="toggleCart()">
+      <button class="icon-button icon-button--small cart-counter-button" type="button" (click)="toggleCart()" [attr.aria-label]="'Open cart, ' + cartQuantities.quantity() + ' items in the selected reservation draft'">
         <img
           [src]="'assets/svg/cart-empty.svg'"
           alt="cart icon"
           class="action-icon"
         />
+        <span class="cart-quantity" aria-hidden="true">{{ cartQuantities.quantity() }}</span>
       </button>
     }
 

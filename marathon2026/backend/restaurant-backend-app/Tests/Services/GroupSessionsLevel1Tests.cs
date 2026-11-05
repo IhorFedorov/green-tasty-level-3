@@ -28,10 +28,10 @@ public class GroupSessionsLevel1Tests
     private GuestSessionService Service => new(groups.Object, sessions.Object, dishes.Object,
         reservations.Object, users.Object, Mock.Of<ITableRepository>());
 
-    private void Owner(string owner = "owner")
+    private void Owner(string owner = "owner", GroupReservationStatus status = GroupReservationStatus.Open)
     {
         groups.Setup(x => x.GetGroupReservationByIdAsync("g")).ReturnsAsync(new GroupReservation
-        { GroupReservationId = "g", ReservationId = "r", ReservationToken = "unused" });
+        { GroupReservationId = "g", ReservationId = "r", ReservationToken = "unused", Status = status });
         reservations.Setup(x => x.GetReservationByIdAsync("r")).ReturnsAsync(new Reservation
         { Id = "r", CustomerId = owner, TableId = "t", WaiterId = "w" });
     }
@@ -62,6 +62,22 @@ public class GroupSessionsLevel1Tests
         Assert.Equal("d1", people[0].Items.Single().Dish.Id);
         sessions.Verify(x => x.GetAllByGroupReservationIdAsync("g"), Times.Once);
         sessions.VerifyNoOtherCalls(); // strict repositories also reject any unexpected write
+    }
+
+    [Fact]
+    public async Task SubmittedSnapshot_RemainsReadableByOwnerWithoutWrites()
+    {
+        Owner(status: GroupReservationStatus.Submitted);
+        sessions.Setup(x => x.GetAllByGroupReservationIdAsync("g"))
+            .ReturnsAsync([Session("guestA", true, "bowl", 3), Session("guestB", true, "salad", 3)]);
+        dishes.Setup(x => x.GetDishesByIdsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([new Dish { Id = "bowl", Name = "Bowl", Price = 10 },
+                          new Dish { Id = "salad", Name = "Salad", Price = 6 }]);
+        var result = await Service.GetGroupSessionsAsync("owner", "g");
+        Assert.Equal(48m, result.Total);
+        Assert.Equal(2, result.Participants.Count());
+        sessions.Verify(x => x.GetAllByGroupReservationIdAsync("g"), Times.Once);
+        sessions.VerifyNoOtherCalls(); users.VerifyNoOtherCalls();
     }
 
     [Fact]

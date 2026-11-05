@@ -13,7 +13,14 @@ public class GetOwnerSessionIdHandler(GroupPreOrderService service) : IApiReques
 {
     public Task<APIGatewayProxyResponse> HandleRequest(APIGatewayProxyRequest request, ILambdaContext context) =>
         Level2Response.Handle(request, context, "reservationId", async (user, id) =>
-            new { guestSessionId = await service.GetOwnerSessionIdAsync(user, id) });
+        {
+            if (request.QueryStringParameters?.TryGetValue("view", out var view) == true)
+            {
+                if (view != "state") throw new ValidationException("Unsupported Owner view.");
+                return await service.GetOwnerGroupStateAsync(user, id);
+            }
+            return new { guestSessionId = await service.GetOwnerSessionIdAsync(user, id) };
+        });
 }
 
 public class SubmitGroupPreOrderHandler(GroupPreOrderService service) : IApiRequestHandler

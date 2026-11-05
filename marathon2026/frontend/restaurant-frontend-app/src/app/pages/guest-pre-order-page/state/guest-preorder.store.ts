@@ -29,6 +29,9 @@ export interface GuestCartItem {
 @Injectable({ providedIn: 'root' })
 export class GuestPreorderStore {
     private readonly contextId = signal<string | null>(null);
+    private readonly pendingCartSessions = new Set<string>();
+    private readonly pendingSubmits = new Set<string>();
+    private readonly completedCarts = new Map<string, { items: GuestCartItem[]; name: string }>();
     private readonly guestInviteService = inject(GuestInviteService);
 
     readonly invite = signal<GuestInvite | null>(null);
@@ -60,6 +63,7 @@ export class GuestPreorderStore {
     readonly total = computed(() =>
         this.cartItems().reduce((sum, i) => sum + i.price * i.qty, 0)
     );
+    readonly itemCount = computed(() => this.cartItems().reduce((sum, item) => sum + item.qty, 0));
 
     constructor() {
         effect(() => {
@@ -80,6 +84,12 @@ export class GuestPreorderStore {
         if (!id) return;
         if (this.contextId() === id) return;
 
+        // A new invitation is a separate guest cart, never the previous session's state.
+        this.guestSessionId.set(null); this.guestSessionToken.set(null);
+        this.guestName.set(''); this.cartItems.set([]); this.invite.set(null);
+        this.status.set('active'); this.menuByCategory.set({});
+        this.cartBusy.set(false); this.cartError.set(null); this.joinError.set(null);
+        this.joinLoading.set(false); this.menuLoading.set(false); this.menuError.set(null);
         this.contextId.set(id);
         void this.loadInviteByToken(id);
 
@@ -91,9 +101,11 @@ export class GuestPreorderStore {
 
         if (sessionId) this.guestSessionId.set(sessionId);
         if (sessionToken) this.guestSessionToken.set(sessionToken);
+        if (sessionId && (this.pendingCartSessions.has(sessionId) || this.pendingSubmits.has(sessionId))) this.cartBusy.set(true);
+        const completed = sessionId ? this.completedCarts.get(sessionId) : undefined;
 
         // If guest was already joined on this device/browser, load menu automatically
-        if (this.guestSessionId() && this.guestSessionToken()) {
+        if (!completed && this.guestSessionId() && this.guestSessionToken()) {
             void this.loadMenu();
         }
 
@@ -107,6 +119,9 @@ export class GuestPreorderStore {
                 // ignore parse errors
             }
         }
+        if (completed) {
+            this.cartItems.set(completed.items); this.guestName.set(completed.name); this.status.set('submitted');
+        }
     }
 
     async loadInviteByToken(token: string) {
@@ -115,17 +130,20 @@ export class GuestPreorderStore {
 
         try {
             const inv = await firstValueFrom(this.guestInviteService.getInvite$(token));
+            if (this.contextId() !== token) return;
             this.invite.set(inv);
         } catch (error) {
+            if (this.contextId() !== token) return;
             this.invite.set(null);
             const status = error instanceof HttpErrorResponse ? error.status : null;
             this.inviteError.set(status === 404 || status === 410 ? 'expired' : 'retryable');
         } finally {
-            this.inviteLoading.set(false);
+            if (this.contextId() === token) this.inviteLoading.set(false);
         }
     }
 
     async join(name: string) {
+        const context = this.contextId();
         const inv = this.invite();
         if (!inv) {
             this.joinError.set('Invite is not loaded yet');
@@ -152,14 +170,16 @@ export class GuestPreorderStore {
 
         try {
             const res = await firstValueFrom(this.guestSessionsService.createSession(payload));
+            if (this.contextId() !== context) return;
             this.guestSessionId.set(res.SessionId);
             this.guestSessionToken.set(res.SessionToken);
             await this.loadMenu();
         } catch (e) {
+            if (this.contextId() !== context) return;
             console.log('[join error]', e);
             this.joinError.set('Failed to join session');
         } finally {
-            this.joinLoading.set(false);
+            if (this.contextId() === context) this.joinLoading.set(false);
         }
     }
 
@@ -201,6 +221,7 @@ export class GuestPreorderStore {
     });
 
     async loadMenu() {
+        const context = this.contextId();
         const id = this.guestSessionId();
         const token = this.guestSessionToken();
         if (!id || !token) return;
@@ -210,16 +231,18 @@ export class GuestPreorderStore {
 
         try {
             const res = await firstValueFrom(this.guestSessionsService.getMenu(id, token));
+            if (this.contextId() !== context || this.guestSessionId() !== id) return;
             console.log('[menu response]', res);
             console.log('[menu dishes keys]', Object.keys(res.dishes ?? {}));
 
             this.menuByCategory.set(res.dishes ?? {});
         } catch (e) {
+            if (this.contextId() !== context || this.guestSessionId() !== id) return;
             console.log('[menu error]', e);
             this.menuError.set('Failed to load menu');
             this.menuByCategory.set({});
         } finally {
-            this.menuLoading.set(false);
+            if (this.contextId() === context && this.guestSessionId() === id) this.menuLoading.set(false);
         }
     }
 
@@ -228,30 +251,29 @@ export class GuestPreorderStore {
     }
 
     async addDish(item: Omit<GuestCartItem, 'qty'>): Promise<boolean> {
-        return this.changeRemoteQuantity(item.dishId, 1, 'add', () => {
-            const items = this.cartItems();
+        return this.changeRemoteQuantity(item.dishId, 1, 'add', items => {
             const existing = items.find(cartItem => cartItem.dishId === item.dishId);
-            this.cartItems.set(existing
+            return existing
                 ? items.map(cartItem => cartItem.dishId === item.dishId
                     ? { ...cartItem, qty: cartItem.qty + 1 }
                     : cartItem)
-                : [...items, { ...item, qty: 1 }]);
+                : [...items, { ...item, qty: 1 }];
         });
     }
 
     async inc(dishId: string): Promise<boolean> {
-        return this.changeRemoteQuantity(dishId, 1, 'add', () => {
-            this.cartItems.set(this.cartItems().map(item =>
+        return this.changeRemoteQuantity(dishId, 1, 'add', items => {
+            return items.map(item =>
                 item.dishId === dishId ? { ...item, qty: item.qty + 1 } : item
-            ));
+            );
         });
     }
 
     async dec(dishId: string): Promise<boolean> {
-        return this.changeRemoteQuantity(dishId, 1, 'remove', () => {
-            this.cartItems.set(this.cartItems()
+        return this.changeRemoteQuantity(dishId, 1, 'remove', items => {
+            return items
                 .map(item => item.dishId === dishId ? { ...item, qty: item.qty - 1 } : item)
-                .filter(item => item.qty > 0));
+                .filter(item => item.qty > 0);
         });
     }
 
@@ -259,29 +281,36 @@ export class GuestPreorderStore {
         const item = this.cartItems().find(cartItem => cartItem.dishId === dishId);
         if (!item) return false;
 
-        return this.changeRemoteQuantity(dishId, item.qty, 'remove', () => {
-            this.cartItems.set(this.cartItems().filter(cartItem => cartItem.dishId !== dishId));
+        return this.changeRemoteQuantity(dishId, item.qty, 'remove', items => {
+            return items.filter(cartItem => cartItem.dishId !== dishId);
         });
     }
 
     async submitPreorder() {
+        const context = this.contextId();
         const sessionId = this.guestSessionId();
         const token = this.guestSessionToken();
         if (!sessionId || !token) {
             this.cartError.set('Your guest session has expired. Please rejoin the reservation.');
             return;
         }
-        if (this.cartItems().length === 0 || this.cartBusy()) return;
+        if (this.cartItems().length === 0 || this.cartBusy() || this.pendingSubmits.has(sessionId) || this.status() !== 'active') return;
 
+        const submittedCart = { items: this.cartItems(), name: this.guestName() };
+        this.pendingSubmits.add(sessionId);
         this.cartBusy.set(true);
         this.cartError.set(null);
         try {
             await firstValueFrom(this.guestSessionsService.submit(sessionId, token));
-            this.submitSuccess();
+            this.completedCarts.set(sessionId, submittedCart);
+            if (this.contextId() === context && this.guestSessionId() === sessionId) this.submitSuccess();
+            else if (context && localStorage.getItem(this.key(context, 'guestSessionId')) === sessionId) this.clearStorage(context);
         } catch {
+            if (this.contextId() !== context || this.guestSessionId() !== sessionId) return;
             this.cartError.set('Could not submit your pre-order. Please try again.');
         } finally {
-            this.cartBusy.set(false);
+            this.pendingSubmits.delete(sessionId);
+            if (this.contextId() === context && this.guestSessionId() === sessionId) this.cartBusy.set(false);
         }
     }
 
@@ -317,14 +346,15 @@ export class GuestPreorderStore {
                 groupReservationId: invite.GroupReservationId,
                 guestName,
             }));
+            if (this.contextId() !== ctx) return;
             this.guestSessionId.set(session.SessionId);
             this.guestSessionToken.set(session.SessionToken);
             await this.loadMenu();
         } catch {
+            if (this.contextId() !== ctx) return;
             this.menuError.set('Could not start a new pre-order. Please try again.');
         } finally {
-            this.menuLoading.set(false);
-            this.joinLoading.set(false);
+            if (this.contextId() === ctx) { this.menuLoading.set(false); this.joinLoading.set(false); }
         }
     }
 
@@ -332,15 +362,19 @@ export class GuestPreorderStore {
         dishId: string,
         quantity: number,
         operation: 'add' | 'remove',
-        updateLocalCart: () => void,
+        updateLocalCart: (items: GuestCartItem[]) => GuestCartItem[],
     ): Promise<boolean> {
+        const context = this.contextId();
         const sessionId = this.guestSessionId();
         const token = this.guestSessionToken();
         if (!sessionId || !token) {
             this.cartError.set('Your guest session has expired. Please rejoin the reservation.');
             return false;
         }
-        if (this.cartBusy()) return false;
+        if (this.cartBusy() || this.pendingCartSessions.has(sessionId) || this.pendingSubmits.has(sessionId) || this.status() !== 'active') return false;
+
+        const previousCart = this.cartItems();
+        this.pendingCartSessions.add(sessionId);
 
         this.cartBusy.set(true);
         this.cartError.set(null);
@@ -349,13 +383,18 @@ export class GuestPreorderStore {
                 ? this.guestSessionsService.addDish(sessionId, token, dishId, quantity)
                 : this.guestSessionsService.removeDish(sessionId, token, dishId, quantity);
             await firstValueFrom(request);
-            updateLocalCart();
+            const updated = updateLocalCart(previousCart);
+            if (this.contextId() === context && this.guestSessionId() === sessionId) this.cartItems.set(updated);
+            else if (context && localStorage.getItem(this.key(context, 'guestSessionId')) === sessionId)
+                localStorage.setItem(this.key(context, 'cart'), JSON.stringify(updated));
             return true;
         } catch {
+            if (this.contextId() !== context || this.guestSessionId() !== sessionId) return false;
             this.cartError.set('Could not update your cart. Please try again.');
             return false;
         } finally {
-            this.cartBusy.set(false);
+            this.pendingCartSessions.delete(sessionId);
+            if (this.contextId() === context && this.guestSessionId() === sessionId) this.cartBusy.set(false);
         }
     }
 

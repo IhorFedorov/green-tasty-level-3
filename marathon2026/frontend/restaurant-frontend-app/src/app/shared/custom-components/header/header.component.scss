@@ -1,5 +1,10 @@
 @use 'app/shared/styles/abstracts/colors' as color;
 
+.cart-counter-button { position: relative; }
+.mobile-cart-shortcut { display: none; }
+@media (max-width: 768px) { .mobile-cart-shortcut { display: inline-flex; } }
+.cart-quantity { position: absolute; top: -4px; right: -5px; min-width: 20px; padding: 2px 4px; border-radius: 12px; text-align: center; font-size: 12px; font-weight: 600; line-height: 16px; background: color.$green-800; color: color.$neutral-0; }
+
 .header {
   display: flex;
   justify-content: space-between;

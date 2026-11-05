@@ -1,4 +1,6 @@
 export interface GuestInvite {
+  /** Client-only path derived from the authenticated invitation response. */
+  invitationPath?: string;
   GroupReservationId: string;
   LocationId: string;
   RestaurantName: string;

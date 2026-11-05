@@ -121,10 +121,15 @@ public class GroupReservationService(
         await groupReservationRepository.SaveGroupReservationAsync(groupReservation);
     }
 
-    public async Task<GetGroupInviteTokenResponse> GetGroupReservationInviteTokenAsync(string reservationId)
+    public async Task<GetGroupInviteTokenResponse> GetGroupReservationInviteTokenAsync(string reservationId, string userId)
     {
+        if (string.IsNullOrWhiteSpace(userId))
+            throw new ActionForbiddenException("Only the reservation owner can retrieve an invitation.");
         var reservation = await reservationRepository.GetReservationByIdAsync(reservationId)
             ?? throw new ReservationNotFoundException($"Reservation {reservationId} was not found.");
+
+        if (reservation.CustomerId != userId)
+            throw new ActionForbiddenException("Only the reservation owner can retrieve an invitation.");
 
         if (reservation.GuestCount < 2)
             throw new ValidationException("Retrieving invitation token for the reservation with only one guest is not permitted.");
@@ -132,13 +137,19 @@ public class GroupReservationService(
         if (reservation.Status != ReservationStatus.Reserved)
             throw new GroupReservationExpiredException("The group reservation is expired.");
 
-        GroupReservation groupReservation = (await groupReservationRepository.GetByReservationIdAsync(reservationId))!;
+        var groupReservation = await groupReservationRepository.GetByReservationIdAsync(reservationId)
+            ?? throw new GroupReservationNotFoundException();
+        if (groupReservation.ReservationId != reservationId)
+            throw new ValidationException("Reservation does not belong to this group.");
 
         if (groupReservation.Status == GroupReservationStatus.Submitted)
             throw new GroupReservationSubmittedException();
 
         if (groupReservation.Status == GroupReservationStatus.Closed)
             throw new GroupReservationExpiredException();
+
+        if (groupReservation.Status != GroupReservationStatus.Open)
+            throw new ValidationException("Unsupported group status.");
 
         return new GetGroupInviteTokenResponse(groupReservation.ReservationToken);
     }

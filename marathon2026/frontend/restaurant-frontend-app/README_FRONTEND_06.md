@@ -1,5 +1,36 @@
 # Frontend homework — Owner Group Pre-order
 
+## Local cart counter — 2026-11-05
+
+Quantity badges count units, not distinct dishes, on Customer desktop/mobile and
+guest cart icons. Owner badge tracks the selected reservation's Created draft;
+it never sums unrelated bookings. The last selection survives SPA navigation;
+multiple carts with no selected context show zero until reservation selection.
+Customer changes clear UI-only state. Guest counters track their own session;
+late cart/Submit responses cannot overwrite another guest context. Existing API
+methods/payloads/prices are unchanged. Node90 tests, template/spec checks and
+independent review pass. No production build, browser/mobile visual check or
+deployment this step. Existing backend153 results retained, not rerun.
+
+## Local P1 Invite guests — 2026-11-05
+
+Owner returns through Reservations -> Group Pre-Order -> Invite guests. Shared
+modal shows the existing absolute link and Copy Invite Link; clipboard denial
+keeps manual copy available. Opening/copying makes no extra API request. Invite
+group must match the Owner state; Submitted groups expose no invitation control.
+Node72, backend153, Angular template/app/spec checks and independent static review
+pass. Not deployed; real clipboard/browser and production bundle remain untested.
+
+## Local P0 Submitted reopen correction — 2026-11-05
+
+Owner bootstrap reads the existing Cognito-protected endpoint with `view=state`.
+Submitted groups bypass invitation APIs and Owner creation, display persisted
+Order quantities with participant/catalog details, and disable Submit/Invite/
+Refresh/polling. Open groups retain their invitation/ensure flow. Node69 tests,
+Angular app/template and spec type checks pass. No DOM/browser or new production
+bundle was run. Not deployed; backend query-mode support must ship first under
+separate approval. Prices remain current catalog prices, not frozen invoices.
+
 ## Accepted submission scope — 2026-11-04
 
 Completion sprint: local Customer Group Pre-Order navigation and explicit draft

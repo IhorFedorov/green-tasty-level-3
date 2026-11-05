@@ -24,8 +24,9 @@
         }
     </div>
 
-    <button type="button" class="cart-btn" (click)="openCart()" aria-label="Open cart">
+    <button type="button" class="cart-btn" (click)="openCart()" [attr.aria-label]="'Open cart, ' + store.itemCount() + ' items'">
         <img src="assets/svg/cart-empty.svg" alt="" />
+        <span class="cart-quantity" aria-hidden="true">{{ store.itemCount() }}</span>
     </button>
 </div>
 

@@ -41,6 +41,9 @@ const imports = [
   "import './src/app/pages/group-order-page/group-order-page.component.logic.spec.ts';",
   "import './src/app/auth/token.owner-group.spec.ts';",
   "import './src/app/components/reservations/card-reservation/card-reservation.group-navigation.spec.ts';",
+  "import './src/app/services/pre-orders/cart-quantity.spec.ts';",
+  "import './src/app/pages/guest-pre-order-page/state/guest-cart-counter.spec.ts';",
+  "import './src/app/shared/custom-components/header/header.cart-counter.spec.ts';",
 ];
 const built = require('esbuild').buildSync({
   stdin: { contents: imports.join('\n'), resolveDir: root, sourcefile: 'homework-node.ts', loader: 'ts' },

@@ -46,8 +46,9 @@ describe('Рівень 3 · синхронізація', () => {
 
   beforeEach(() => {
     service = jasmine.createSpyObj<GroupOrdersService>('GroupOrdersService', [
-      'getGroupInvite$', 'getSessions$', 'getOwnerSessionId$', 'getStatus$', 'submit$',
+      'getOwnerState$', 'getGroupInvite$', 'getSessions$', 'getOwnerSessionId$', 'getStatus$', 'submit$',
     ]);
+    service.getOwnerState$.and.returnValue(of({ status: 'Open', groupReservationId: 'grp-1' } as any));
     service.getGroupInvite$.and.returnValue(of(INVITE));
     service.getSessions$.and.returnValue(of(structuredClone(SESSIONS)));
     service.getOwnerSessionId$.and.returnValue(of('owner'));
